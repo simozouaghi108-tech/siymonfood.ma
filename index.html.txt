@@ -1,0 +1,1393 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>siymon | صفحة هبوط لطلب الطعام</title>
+
+  <style>
+    :root{
+      --bg:#F7F4EF;
+      --card:#ffffff;
+      --text:#111;
+      --muted:#666;
+      --brand:#ff5722;
+      --brand2:#1f8a70;
+      --shadow:0 6px 18px rgba(0,0,0,.10);
+      --radius:16px;
+    }
+
+    /* ✅ Dark Theme */
+    html[data-theme="dark"]{
+      --bg:#0f0f10;
+      --card:#17181a;
+      --text:#f2f2f2;
+      --muted:#b8b8b8;
+      --shadow:0 10px 25px rgba(0,0,0,.45);
+    }
+    html[data-theme="dark"] header{
+      background:rgba(15,15,16,.92);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    html[data-theme="dark"] .btn.ghost{ border:1px solid rgba(255,255,255,.12); }
+    html[data-theme="dark"] .chip{ border:1px solid rgba(255,255,255,.12); }
+    html[data-theme="dark"] .badge,
+    html[data-theme="dark"] .chip,
+    html[data-theme="dark"] .btn{
+      background:var(--card);
+      color:var(--text);
+    }
+    html[data-theme="dark"] .field input,
+    html[data-theme="dark"] .field textarea{
+      background:var(--card);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    html[data-theme="dark"] .cart-item{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+
+    header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(247,244,239,.92);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+
+    .wrap{width:min(1150px, 92%); margin:auto}
+
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .brand{display:flex; align-items:center; gap:12px;}
+    .logo-img{
+      width:50px; height:50px;
+      border-radius:14px;
+      object-fit:contain;
+      box-shadow: var(--shadow);
+      background:#000;
+      padding:6px;
+    }
+    .brand h1{margin:0; font-size:20px; letter-spacing:.4px;}
+    .brand p{margin:0; color:var(--muted); font-size:13px}
+
+    .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+
+    .btn{
+      border:none; cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      color:#111;
+      font-weight:600;
+      transition:.15s transform ease, .15s opacity ease;
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn.primary{background:var(--brand); color:#fff}
+    .btn.good{background:var(--brand2); color:#fff}
+    .btn.ghost{background:transparent; box-shadow:none; border:1px solid rgba(0,0,0,.10)}
+    .btn:disabled{opacity:.65; cursor:not-allowed}
+
+    /* ✅ شريط الحالة */
+    .statusbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:0 0 14px 0;
+      flex-wrap:wrap;
+    }
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+      font-weight:800;
+      font-size:13px;
+    }
+    .dot{width:10px;height:10px;border-radius:50%;background:#bbb;display:inline-block;}
+    .badge.open .dot{ background: var(--brand2); }
+    .badge.closed .dot{ background: #d33; }
+    .status-text{color:var(--muted); font-size:12px}
+
+    .chips{display:flex; gap:10px; flex-wrap:wrap; padding:0 0 10px 0;}
+    .chip{
+      padding:9px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      cursor:pointer;
+      font-weight:700;
+      color:#222;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+      user-select:none;
+    }
+    .chip.active{
+      border-color: rgba(255,87,34,.35);
+      box-shadow: 0 8px 18px rgba(255,87,34,.12);
+      color: var(--brand);
+    }
+
+    main{padding:18px 0 40px}
+
+    .layout{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: 1.6fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px;}
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.05);
+    }
+    .img{width:100%; height:150px; border-radius:14px; background:#eee; overflow:hidden;}
+    .img img{width:100%; height:100%; object-fit:cover; display:block}
+    .card h3{margin:10px 0 2px 0; font-size:16px}
+    .card p{margin:0; color:var(--muted); font-size:13px; min-height:38px}
+    .row{display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:10px;}
+    .price{font-weight:900}
+    .add{width:100%}
+
+    .side{position:sticky; top:90px;}
+
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      border:1px solid rgba(0,0,0,.05);
+    }
+    .panel h3{margin:0 0 10px 0}
+    .cart-items{display:flex; flex-direction:column; gap:10px; margin:10px 0}
+    .cart-item{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.06);
+    }
+    .cart-item b{display:block}
+    .cart-item small{color:var(--muted)}
+    .qty{display:flex; align-items:center; gap:8px; justify-content:flex-end;}
+    .qty button{
+      width:34px; height:34px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .qty span{min-width:18px; text-align:center; font-weight:900}
+
+    .totals-row{display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-weight:900;}
+    .totals{
+      border-top:1px dashed rgba(0,0,0,.18);
+      padding-top:10px;
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:10px;
+      font-weight:900;
+    }
+
+    .form{margin-top:12px; display:grid; gap:10px;}
+    .field label{display:block; font-weight:800; font-size:13px; margin-bottom:6px}
+    .field input, .field textarea{
+      width:100%;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      background:#fff;
+      font-size:14px;
+    }
+    .field textarea{min-height:70px; resize:vertical}
+
+    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+    .muted{color:var(--muted)}
+    .empty{
+      padding:12px;
+      border-radius:14px;
+      border:1px dashed rgba(0,0,0,.2);
+      color:var(--muted);
+      text-align:center;
+      background:rgba(255,255,255,.6);
+    }
+
+    /* ✅ Support icon button (no phone shown) */
+    .support-row{
+      margin-top:10px;
+      display:flex;
+      justify-content:flex-end;
+    }
+    .support-icon{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      cursor:pointer;
+      font-size:20px;
+    }
+    html[data-theme="dark"] .support-icon{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+    }
+    .support-icon:active{transform:scale(.98)}
+
+    footer{
+      padding:18px 0 30px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      .side{position:static}
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <img class="logo-img"
+               src="https://uploads.onecompiler.io/43xh82fwf/44atfud5t/Photoroom-20260117_132534545.png"
+               alt="siymon logo" />
+          <div>
+            <h1>siymon</h1>
+            <p id="subtitle">اطلب أكلك المفضل بسرعة</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost" id="langToggle" type="button">EN</button>
+          <button class="btn ghost" id="themeToggle" type="button" title="Theme">🌙</button>
+          <button class="btn" id="clearCart" type="button">🧹 <span id="clearText">تفريغ السلة</span></button>
+          <button class="btn primary" id="goCart" type="button">🛒 <span id="cartCount">0</span></button>
+        </div>
+      </div>
+
+      <div class="statusbar">
+        <span id="openBadge" class="badge">
+          <span class="dot"></span>
+          <span id="openText">...</span>
+        </span>
+        <span id="hoursText" class="status-text"></span>
+      </div>
+
+      <div class="chips" id="categoryChips"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="layout">
+      <div>
+        <div class="grid" id="productsGrid"></div>
+      </div>
+
+      <aside class="side">
+        <div class="panel" id="cartPanel">
+          <h3 id="cartTitle">السلة</h3>
+          <div id="cartItems" class="cart-items"></div>
+
+          <div class="totals-row">
+            <span id="subTotalLabel">المجموع الفرعي</span>
+            <span id="subTotalValue">0.00</span>
+          </div>
+          <div class="totals-row">
+            <span id="deliveryFeeLabel">رسوم التوصيل</span>
+            <span id="deliveryFeeValue">0.00</span>
+          </div>
+          <div class="totals">
+            <span id="totalLabel">الإجمالي</span>
+            <span id="totalValue">0.00</span>
+          </div>
+
+          <div class="form">
+            <div class="field">
+              <label id="deliveryFeeInputLabel" for="deliveryFeeInput">قيمة رسوم التوصيل</label>
+              <input id="deliveryFeeInput" type="number" min="0" step="1" placeholder="مثال: 10" />
+              <div class="hint" id="deliveryFeeHint">تتغيرحسب المدينة او المسافة.</div>
+            </div>
+
+            <div class="field">
+              <label id="nameLabel" for="custName">الاسم</label>
+              <input id="custName" type="text" placeholder="مثال: محمد" />
+            </div>
+
+            <div class="field">
+              <label id="phoneLabel" for="custPhone">رقم الهاتف</label>
+              <input id="custPhone" type="tel" placeholder="06/07xxxxxxxx" />
+            </div>
+
+            <div class="field">
+              <label id="addrLabel" for="custAddr">العنوان</label>
+              <input id="custAddr" type="text" placeholder="المدينة، الحي..." />
+            </div>
+
+            <div class="field">
+              <label id="notesLabel" for="custNotes">ملاحظات (اختياري)</label>
+              <textarea id="custNotes" placeholder="بدون بصل، حار، ..."></textarea>
+            </div>
+
+            <button class="btn ghost" id="getAddrBtn" type="button">📍 <span id="getAddrText">جلب العنوان</span></button>
+            <div class="hint" id="locHint">قد يطلب المتصفح الإذن للوصول للموقع.</div>
+
+            <button class="btn ghost" id="printInvoice" type="button">🖨️ <span id="printText">طباعة الفاتورة</span></button>
+
+            <button class="btn ghost" id="btPrintInvoice" type="button">🧾📶 <span id="btPrintText">طباعة عبر البلوتوث</span></button>
+            <div class="hint" id="btHint"></div>
+
+            <button class="btn good" id="sendWhatsApp" type="button">📲 <span id="sendText">إرسال الطلب عبر واتساب</span></button>
+            <div class="hint" id="sendHint"></div>
+
+            <!-- ✅ أيقونة الدعم فقط (بدون عرض الرقم) -->
+            <div class="support-row">
+              <button class="support-icon" id="callSupportIcon" type="button" title="Support">📞</button>
+            </div>
+
+            <div class="hint" id="closedHint" style="display:none;color:#b00;font-weight:800">
+              المتجر مغلق حالياً. لا يمكن إرسال الطلب الآن.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span id="footerText">© siymon</span>
+    </div>
+  </footer>
+
+  <script>
+    /***********************
+     * إعدادات سريعة
+     ***********************/
+    const WHATSAPP_NUMBER = "212617139424";
+    const SUPPORT_PHONE   = "212617139424"; // ✅ رقم الدعم (لن يظهر)
+
+    const CURRENCY_AR = "درهم";
+    const CURRENCY_EN = "MAD";
+
+    const ENABLE_PICKUP = false;
+    const DEFAULT_DELIVERY_FEE = 10;
+
+    const BUSINESS = {
+      open:  { h: 12, m: 0 },
+      close: { h: 0,  m: 0 },
+      days:  [0, 1] // Sunday, Monday
+    };
+
+    const i18n = {
+      ar: {
+        dir: "rtl",
+        title: "siymon | صفحة هبوط لطلب الطعام",
+        subtitle: "اطلب أكلك المفضل بسرعة",
+        cartTitle: "السلة",
+        emptyCart: "السلة فارغة. أضف منتجات من القائمة 👇",
+
+        openNow: "مفتوح الآن",
+        closedNow: "مغلق الآن",
+        hoursText: "ساعات العمل: 12:00 إلى 00:00 — من الأحد إلى الإثنين",
+
+        subTotalLabel: "المجموع الفرعي",
+        deliveryFeeLabel: "رسوم التوصيل",
+        totalLabel: "الإجمالي",
+
+        deliveryFeeInputLabel: "قيمة رسوم التوصيل",
+        deliveryFeePlaceholder: "مثال: 10",
+        deliveryFeeHint: "تتغير حسب المدينة او المسافة.",
+
+        nameLabel: "الاسم",
+        phoneLabel: "رقم الهاتف",
+        addrLabel: "العنوان",
+        notesLabel: "ملاحظات (اختياري)",
+
+        sendText: "إرسال الطلب عبر واتساب",
+        sendHint: "",
+        clearText: "تفريغ السلة",
+        addBtn: "أضف للسلة",
+        categoryAll: "الكل",
+
+        getAddrText: "جلب العنوان تلقائياً",
+        locHint: "قد يطلب المتصفح الإذن للوصول للموقع.",
+
+        printText: "طباعة الفاتورة",
+        btPrintText: "طباعة عبر البلوتوث",
+        btHint: "",
+        bt: {
+          unsupported: "الطباعة عبر البلوتوث غير مدعومة في هذا المتصفح. جرب Chrome على Android.",
+          needHttps: "خاص الموقع يكون HTTPS باش يخدم Web Bluetooth (GitHub Pages كافيه).",
+          connecting: "جارٍ الاتصال بالطابعة...",
+          connected: "تم الاتصال بالطابعة ✅",
+          failed: "تعذر الاتصال بالطابعة. تأكد من تشغيل البلوتوث والطابعة.",
+          printed: "تم إرسال الفاتورة للطابعة ✅"
+        },
+
+        geo: {
+          unsupported: "المتصفح لا يدعم تحديد الموقع",
+          denied: "تعذر تحديد موقعك، المرجو السماح بالوصول للموقع",
+          locating: "جارٍ تحديد موقعك...",
+          filled: "تم ملء العنوان تلقائياً ✅",
+          failed: "تعذر جلب العنوان، تم وضع الإحداثيات بدلًا عنه."
+        },
+
+        validations: {
+          needItems: "أضف منتجات للسلة أولاً.",
+          needName: "اكتب اسمك من فضلك.",
+          needAddress: "اكتب العنوان من فضلك.",
+          closed: "المتجر مغلق حالياً. لا يمكن إرسال الطلب الآن."
+        },
+
+        footer: "© siymon",
+        msg: {
+          header: "طلب جديد من siymon",
+          customer: "الزبون",
+          phone: "الهاتف",
+          address: "العنوان",
+          notes: "ملاحظات",
+          items: "الطلبات",
+          subtotal: "المجموع الفرعي",
+          deliveryFee: "رسوم التوصيل",
+          total: "الإجمالي",
+          thanks: "شكراً لكم"
+        }
+      },
+      en: {
+        dir: "ltr",
+        title: "siymon | Food Ordering Landing Page",
+        subtitle: "Order your favorite food fast",
+        cartTitle: "Cart",
+        emptyCart: "Cart is empty. Add items from the list 👇",
+
+        openNow: "Open now",
+        closedNow: "Closed now",
+        hoursText: "Working hours: 12:00 → 00:00 — Sun to Mon",
+
+        subTotalLabel: "Subtotal",
+        deliveryFeeLabel: "Delivery fee",
+        totalLabel: "Total",
+
+        deliveryFeeInputLabel: "Delivery fee amount",
+        deliveryFeePlaceholder: "e.g. 10",
+        deliveryFeeHint: "Adjust based on distance/city.",
+
+        nameLabel: "Name",
+        phoneLabel: "Phone",
+        addrLabel: "Address",
+        notesLabel: "Notes (optional)",
+
+        sendText: "Send order via WhatsApp",
+        sendHint: "",
+        clearText: "Clear cart",
+        addBtn: "Add to cart",
+        categoryAll: "All",
+
+        getAddrText: "Auto-fill address",
+        locHint: "Your browser may ask for location permission.",
+
+        printText: "Print invoice",
+        btPrintText: "Print via Bluetooth",
+        btHint: "",
+        bt: {
+          unsupported: "Bluetooth printing is not supported in this browser. Try Chrome on Android.",
+          needHttps: "Web Bluetooth requires HTTPS (GitHub Pages is fine).",
+          connecting: "Connecting to printer...",
+          connected: "Printer connected ✅",
+          failed: "Couldn't connect. Make sure Bluetooth and printer are on.",
+          printed: "Invoice sent to printer ✅"
+        },
+
+        geo: {
+          unsupported: "Geolocation is not supported by your browser.",
+          denied: "Couldn't get your location. Please allow location access.",
+          locating: "Getting your location...",
+          filled: "Address filled successfully ✅",
+          failed: "Couldn't fetch address; coordinates were used instead."
+        },
+
+        validations: {
+          needItems: "Please add items to the cart first.",
+          needName: "Please enter your name.",
+          needAddress: "Please enter your address.",
+          closed: "We are currently closed. You can't place an order now."
+        },
+
+        footer: "© siymon",
+        msg: {
+          header: "New order from siymon",
+          customer: "Customer",
+          phone: "Phone",
+          address: "Address",
+          notes: "Notes",
+          items: "Items",
+          subtotal: "Subtotal",
+          deliveryFee: "Delivery fee",
+          total: "Total",
+          thanks: "Thank you"
+        }
+      }
+    };
+
+    const products = [
+      { id:"m1", cat:"moroccan", catLabel:{ar:"مغربي", en:"Moroccan"}, price:35,
+        img:"https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"طاجين دجاج", en:"Chicken Tagine"},
+        desc:{ar:"طاجين دجاج بالليمون والزيتون", en:"Chicken tagine with lemon & olives"} },
+      { id:"m2", cat:"moroccan", price:25,
+        img:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"كسكس", en:"Couscous"},
+        desc:{ar:"كسكس بالخضر والمرق", en:"Couscous with vegetables"} },
+
+      { id:"i1", cat:"italian", catLabel:{ar:"إيطالي", en:"Italian"}, price:45,
+        img:"https://images.unsplash.com/photo-1521389508051-d7ffb5dc8ff7?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"بيتزا مارغريتا", en:"Margherita Pizza"},
+        desc:{ar:"طماطم + جبن + ريحان", en:"Tomato + cheese + basil"} },
+      { id:"i2", cat:"italian", price:40,
+        img:"https://images.unsplash.com/photo-1604908554085-2c0a82b1f345?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"باستا ألفريدو", en:"Alfredo Pasta"},
+        desc:{ar:"صلصة كريمية وجبن", en:"Creamy sauce & cheese"} },
+
+      { id:"a1", cat:"american", catLabel:{ar:"أمريكي", en:"American"}, price:50,
+        img:"https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"برغر لحم", en:"Beef Burger"},
+        desc:{ar:"برغر مع بطاطس", en:"Burger with fries"} },
+      { id:"a2", cat:"american", price:30,
+        img:"https://images.unsplash.com/photo-1604908176997-125f25cc5002?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"دجاج مقرمش", en:"Crispy Chicken"},
+        desc:{ar:"قطع دجاج مقرمشة", en:"Crispy chicken bites"} },
+
+      { id:"h1", cat:"indian", catLabel:{ar:"هندي", en:"Indian"}, price:55,
+        img:"https://images.unsplash.com/photo-1604908176997-125f25cc5002?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"دجاج تيكا ماسالا", en:"Chicken Tikka Masala"},
+        desc:{ar:"صلصة متبلة وكريمية", en:"Spiced creamy sauce"} },
+      { id:"h2", cat:"indian", price:20,
+        img:"https://images.unsplash.com/photo-1625944522862-37c4f97e3b16?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"نان", en:"Naan Bread"},
+        desc:{ar:"خبز هندي طري", en:"Soft Indian bread"} },
+
+      { id:"s1", cat:"soda", catLabel:{ar:"مشروبات غازية", en:"Soda"}, price:10,
+        img:"https://images.unsplash.com/photo-1543253687-c931c8e01820?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"مشروب غازي", en:"Soda"},
+        desc:{ar:"علبة 330ml", en:"Can 330ml"} },
+
+      { id:"w1", cat:"water", catLabel:{ar:"مياه", en:"Water"}, price:6,
+        img:"https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=900&q=70",
+        name:{ar:"ماء معدني", en:"Mineral Water"},
+        desc:{ar:"قارورة 500ml", en:"Bottle 500ml"} }
+    ];
+
+    let lang = "ar";
+    let activeCat = "all";
+    const cart = new Map();
+
+    const el = (id) => document.getElementById(id);
+
+    const productsGrid = el("productsGrid");
+    const cartItems = el("cartItems");
+    const categoryChips = el("categoryChips");
+
+    const subTotalValue = el("subTotalValue");
+    const deliveryFeeValue = el("deliveryFeeValue");
+    const totalValue = el("totalValue");
+    const cartCount = el("cartCount");
+
+    const openBadge = el("openBadge");
+    const openText  = el("openText");
+    const hoursText = el("hoursText");
+
+    const langToggle = el("langToggle");
+    const themeToggle = el("themeToggle");
+    const clearCartBtn = el("clearCart");
+    const goCartBtn = el("goCart");
+    const sendBtn = el("sendWhatsApp");
+
+    const getAddrBtn = el("getAddrBtn");
+    const locHint = el("locHint");
+
+    const printBtn = el("printInvoice");
+    const btPrintBtn = el("btPrintInvoice");
+    const btHint = el("btHint");
+
+    const closedHint = el("closedHint");
+    const deliveryFeeInput = el("deliveryFeeInput");
+
+    const custName = el("custName");
+    const custPhone = el("custPhone");
+    const custAddr = el("custAddr");
+    const custNotes = el("custNotes");
+
+    const callSupportIcon = el("callSupportIcon");
+
+    /* ✅ Theme */
+    const THEME_KEY = "siymon_theme_v1";
+    function applyTheme(theme){
+      if(theme === "dark"){
+        document.documentElement.setAttribute("data-theme", "dark");
+        themeToggle.textContent = "☀️";
+      }else{
+        document.documentElement.removeAttribute("data-theme");
+        themeToggle.textContent = "🌙";
+      }
+    }
+    function loadTheme(){
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved){ applyTheme(saved); return; }
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(prefersDark ? "dark" : "light");
+    }
+    function toggleTheme(){
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      const next = isDark ? "light" : "dark";
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    }
+    themeToggle.addEventListener("click", toggleTheme);
+
+    /* ✅ LocalStorage */
+    const LS_KEY = "siymon_cart_v3";
+    function saveCart(){
+      const obj = {
+        lang,
+        items: Array.from(cart.entries()),
+        activeCat,
+        deliveryFee: deliveryFeeInput.value || "",
+        customer: {
+          name: custName.value || "",
+          phone: custPhone.value || "",
+          addr: custAddr.value || "",
+          notes: custNotes.value || ""
+        }
+      };
+      localStorage.setItem(LS_KEY, JSON.stringify(obj));
+    }
+    function loadCart(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return;
+        const obj = JSON.parse(raw);
+
+        if(obj?.lang) lang = obj.lang;
+        if(obj?.activeCat) activeCat = obj.activeCat;
+
+        if(typeof obj?.deliveryFee === "string") deliveryFeeInput.value = obj.deliveryFee;
+
+        if(Array.isArray(obj?.items)){
+          cart.clear();
+          obj.items.forEach(([id, qty])=>{
+            if(typeof id==="string" && Number.isFinite(qty) && qty>0) cart.set(id, qty);
+          });
+        }
+
+        if(obj?.customer){
+          custName.value = obj.customer.name || "";
+          custPhone.value = obj.customer.phone || "";
+          custAddr.value = obj.customer.addr || "";
+          custNotes.value = obj.customer.notes || "";
+        }
+      }catch(e){}
+    }
+
+    function money(v){
+      const num = Number(v || 0);
+      return num.toFixed(2) + " " + (lang==="ar" ? CURRENCY_AR : CURRENCY_EN);
+    }
+    function getProduct(id){ return products.find(p => p.id === id); }
+
+    function cartSubTotal(){
+      let total = 0;
+      for(const [id, qty] of cart.entries()){
+        const p = getProduct(id);
+        if(p) total += p.price * qty;
+      }
+      return total;
+    }
+    function getDeliveryFee(){
+      const n = Number(deliveryFeeInput.value || DEFAULT_DELIVERY_FEE || 0);
+      return Number.isFinite(n) && n >= 0 ? n : 0;
+    }
+    function cartGrandTotal(){ return cartSubTotal() + getDeliveryFee(); }
+    function cartItemsCount(){ let c=0; for(const q of cart.values()) c+=q; return c; }
+
+    /* ✅ ساعات العمل */
+    function isBusinessOpen(now = new Date()){
+      const day = now.getDay();
+      const minutesNow = now.getHours()*60 + now.getMinutes();
+
+      const openMin  = BUSINESS.open.h*60  + BUSINESS.open.m;
+      const closeMin = BUSINESS.close.h*60 + BUSINESS.close.m;
+
+      const overnight = closeMin <= openMin;
+      const isDayAllowed = (d) => BUSINESS.days.includes(d);
+
+      if(!overnight){
+        return isDayAllowed(day) && minutesNow >= openMin && minutesNow < closeMin;
+      }
+      if(minutesNow < closeMin){
+        const prevDay = (day + 6) % 7;
+        return isDayAllowed(prevDay);
+      }
+      return isDayAllowed(day) && minutesNow >= openMin;
+    }
+
+    function updateOpenStatus(){
+      const open = isBusinessOpen(new Date());
+      openBadge.classList.toggle("open", open);
+      openBadge.classList.toggle("closed", !open);
+
+      openText.textContent = open ? i18n[lang].openNow : i18n[lang].closedNow;
+      hoursText.textContent = i18n[lang].hoursText;
+
+      sendBtn.disabled = !open;
+      closedHint.style.display = open ? "none" : "block";
+    }
+
+    function applyI18n(){
+      document.documentElement.lang = lang;
+      document.documentElement.dir = i18n[lang].dir;
+      document.title = i18n[lang].title;
+
+      el("subtitle").textContent = i18n[lang].subtitle;
+
+      el("cartTitle").textContent = i18n[lang].cartTitle;
+      el("subTotalLabel").textContent = i18n[lang].subTotalLabel;
+      el("deliveryFeeLabel").textContent = i18n[lang].deliveryFeeLabel;
+      el("totalLabel").textContent = i18n[lang].totalLabel;
+
+      el("deliveryFeeInputLabel").textContent = i18n[lang].deliveryFeeInputLabel;
+      deliveryFeeInput.placeholder = i18n[lang].deliveryFeePlaceholder;
+      el("deliveryFeeHint").textContent = i18n[lang].deliveryFeeHint;
+
+      el("nameLabel").textContent = i18n[lang].nameLabel;
+      el("phoneLabel").textContent = i18n[lang].phoneLabel;
+      el("addrLabel").textContent = i18n[lang].addrLabel;
+      el("notesLabel").textContent = i18n[lang].notesLabel;
+
+      el("sendText").textContent = i18n[lang].sendText;
+      el("sendHint").textContent = i18n[lang].sendHint;
+
+      el("getAddrText").textContent = i18n[lang].getAddrText;
+      locHint.textContent = i18n[lang].locHint;
+
+      el("printText").textContent = i18n[lang].printText;
+      el("btPrintText").textContent = i18n[lang].btPrintText;
+      btHint.textContent = i18n[lang].btHint;
+
+      el("clearText").textContent = i18n[lang].clearText;
+      el("footerText").textContent = i18n[lang].footer;
+
+      langToggle.textContent = (lang === "ar") ? "EN" : "AR";
+
+      custName.placeholder = (lang==="ar") ? "مثال: محمد" : "e.g. John";
+      custPhone.placeholder = (lang==="ar") ? "06/07xxxxxxxx" : "Phone number";
+      custAddr.placeholder = (lang==="ar") ? "المدينة، الحي..." : "City, street...";
+      custNotes.placeholder = (lang==="ar") ? "بدون بصل، حار، ..." : "No onions, spicy, ...";
+
+      updateOpenStatus();
+    }
+
+    function buildCategoriesFromProducts(){
+      const map = new Map();
+      for(const p of products){
+        if(!p?.cat) continue;
+        if(map.has(p.cat)) continue;
+        const label = p.catLabel || { ar: p.cat, en: p.cat };
+        map.set(p.cat, label);
+      }
+      return Array.from(map.entries()).map(([key, label]) => ({
+        key,
+        label: (label && (label[lang] || label.en || label.ar)) || key
+      }));
+    }
+    function normalizeActiveCat(){
+      if(activeCat === "all") return;
+      const cats = buildCategoriesFromProducts().map(c => c.key);
+      if(!cats.includes(activeCat)) activeCat = "all";
+    }
+    function renderCategories(){
+      normalizeActiveCat();
+      const cats = buildCategoriesFromProducts();
+      const list = [{ key:"all", label: i18n[lang].categoryAll }, ...cats];
+
+      categoryChips.innerHTML = "";
+      list.forEach(c=>{
+        const btn = document.createElement("div");
+        btn.className = "chip" + (activeCat===c.key ? " active" : "");
+        btn.textContent = c.label;
+        btn.addEventListener("click", ()=>{
+          activeCat = c.key;
+          renderAll();
+          saveCart();
+        });
+        categoryChips.appendChild(btn);
+      });
+    }
+
+    function renderProducts(){
+      const filtered = (activeCat==="all") ? products : products.filter(p => p.cat === activeCat);
+      productsGrid.innerHTML = "";
+
+      filtered.forEach(p=>{
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="img">
+            <img src="${p.img}" alt="${p.name[lang]}" loading="lazy"
+                 onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23eee%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-family=%22Arial%22 font-size=%2220%22>Image</text></svg>';">
+          </div>
+          <h3>${p.name[lang]}</h3>
+          <p>${p.desc[lang]}</p>
+          <div class="row">
+            <span class="price">${money(p.price)}</span>
+          </div>
+          <button class="btn primary add addBtn" data-id="${p.id}" type="button">➕ ${i18n[lang].addBtn}</button>
+        `;
+        productsGrid.appendChild(card);
+      });
+
+      document.querySelectorAll(".addBtn").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const id = b.getAttribute("data-id");
+          addToCart(id, 1);
+        });
+      });
+    }
+
+    function renderCart(){
+      cartItems.innerHTML = "";
+
+      if(cart.size === 0){
+        cartItems.innerHTML = `<div class="empty">${i18n[lang].emptyCart}</div>`;
+      }else{
+        for(const [id, qty] of cart.entries()){
+          const p = getProduct(id);
+          if(!p) continue;
+          const subtotal = p.price * qty;
+
+          const item = document.createElement("div");
+          item.className = "cart-item";
+          item.innerHTML = `
+            <div>
+              <b>${p.name[lang]}</b>
+              <small>${money(p.price)} • <span class="muted">${money(subtotal)}</span></small>
+            </div>
+            <div class="qty">
+              <button type="button" data-act="minus" data-id="${id}">−</button>
+              <span>${qty}</span>
+              <button type="button" data-act="plus" data-id="${id}">+</button>
+            </div>
+          `;
+          cartItems.appendChild(item);
+        }
+
+        cartItems.querySelectorAll("button").forEach(btn=>{
+          btn.addEventListener("click", ()=>{
+            const act = btn.getAttribute("data-act");
+            const id = btn.getAttribute("data-id");
+            if(act==="plus") addToCart(id, 1);
+            if(act==="minus") addToCart(id, -1);
+          });
+        });
+      }
+
+      const sub = cartSubTotal();
+      const fee = getDeliveryFee();
+      const grand = cartGrandTotal();
+
+      subTotalValue.textContent = money(sub);
+      deliveryFeeValue.textContent = money(fee);
+      totalValue.textContent = money(grand);
+
+      cartCount.textContent = String(cartItemsCount());
+
+      printBtn.disabled = (cart.size === 0);
+      btPrintBtn.disabled = (cart.size === 0);
+
+      updateOpenStatus();
+    }
+
+    function renderAll(){
+      applyI18n();
+      renderCategories();
+      renderProducts();
+      renderCart();
+    }
+
+    function addToCart(id, delta){
+      const p = getProduct(id);
+      if(!p) return;
+
+      const cur = cart.get(id) || 0;
+      const next = cur + delta;
+
+      if(next <= 0) cart.delete(id);
+      else cart.set(id, next);
+
+      renderCart();
+      saveCart();
+    }
+
+    function clearCart(){
+      cart.clear();
+      renderCart();
+      saveCart();
+    }
+
+    async function getLocation(){
+      if(!navigator.geolocation){
+        alert(i18n[lang].geo.unsupported);
+        return;
+      }
+
+      getAddrBtn.disabled = true;
+      const oldText = el("getAddrText").textContent;
+      el("getAddrText").textContent = i18n[lang].geo.locating;
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        try{
+          const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+          const res = await fetch(url, {
+            headers: { "Accept": "application/json", "Accept-Language": (lang === "ar") ? "ar" : "en" }
+          });
+          const data = await res.json();
+          const display = (data && data.display_name) ? data.display_name : `Lat: ${lat}, Lng: ${lng}`;
+
+          custAddr.value = display;
+          custAddr.dispatchEvent(new Event("input", { bubbles:true }));
+          locHint.textContent = i18n[lang].geo.filled;
+        }catch(e){
+          custAddr.value = `Lat: ${lat}, Lng: ${lng}`;
+          custAddr.dispatchEvent(new Event("input", { bubbles:true }));
+          locHint.textContent = i18n[lang].geo.failed;
+        }finally{
+          getAddrBtn.disabled = false;
+          el("getAddrText").textContent = oldText;
+        }
+      }, () => {
+        alert(i18n[lang].geo.denied);
+        getAddrBtn.disabled = false;
+        el("getAddrText").textContent = oldText;
+      }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+    }
+
+    function buildWhatsAppMessage(){
+      const tr = i18n[lang].msg;
+
+      if(!isBusinessOpen(new Date())) return { error: i18n[lang].validations.closed };
+
+      const name = custName.value.trim();
+      const phone = custPhone.value.trim();
+      const addr = custAddr.value.trim();
+      const notes = custNotes.value.trim();
+
+      if(cart.size === 0) return { error: i18n[lang].validations.needItems };
+      if(!name) return { error: i18n[lang].validations.needName };
+      if(!addr) return { error: i18n[lang].validations.needAddress };
+
+      const lines = [];
+      lines.push(`🧾 ${tr.header}`);
+      lines.push(`----------------------`);
+      lines.push(`👤 ${tr.customer}: ${name}`);
+      if(phone) lines.push(`📞 ${tr.phone}: ${phone}`);
+      lines.push(`📍 ${tr.address}: ${addr}`);
+      if(notes) lines.push(`📝 ${tr.notes}: ${notes}`);
+      lines.push(`----------------------`);
+      lines.push(`🛒 ${tr.items}:`);
+
+      for(const [id, qty] of cart.entries()){
+        const p = getProduct(id);
+        if(!p) continue;
+        const subtotal = p.price * qty;
+        lines.push(`- ${p.name[lang]} × ${qty} = ${money(subtotal)}`);
+      }
+
+      const sub = cartSubTotal();
+      const fee = getDeliveryFee();
+      const grand = cartGrandTotal();
+
+      lines.push(`----------------------`);
+      lines.push(`🧮 ${tr.subtotal}: ${money(sub)}`);
+      lines.push(`🚚 ${tr.deliveryFee}: ${money(fee)}`);
+      lines.push(`💰 ${tr.total}: ${money(grand)}`);
+      lines.push(`🙏 ${tr.thanks}`);
+
+      return { text: lines.join("\n") };
+    }
+
+    function sendToWhatsApp(){
+      const msg = buildWhatsAppMessage();
+      if(msg.error){
+        alert(msg.error);
+        return;
+      }
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg.text)}`;
+      window.open(url, "_blank");
+    }
+
+    function buildInvoiceHTML(){
+      const tr = i18n[lang].msg;
+      const now = new Date();
+      const dateStr = now.toLocaleString(lang === "ar" ? "ar-MA" : "en-US");
+
+      const name = custName.value.trim();
+      const phone = custPhone.value.trim();
+      const addr = custAddr.value.trim();
+      const notes = custNotes.value.trim();
+
+      const sub = cartSubTotal();
+      const fee = getDeliveryFee();
+      const grand = cartGrandTotal();
+
+      const rows = Array.from(cart.entries()).map(([id, qty])=>{
+        const p = getProduct(id);
+        if(!p) return "";
+        const lineTotal = p.price * qty;
+        return `
+          <tr>
+            <td>${p.name[lang]}</td>
+            <td style="text-align:center">${qty}</td>
+            <td style="text-align:center">${money(p.price)}</td>
+            <td style="text-align:center">${money(lineTotal)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+<!doctype html>
+<html lang="${lang}" dir="${i18n[lang].dir}">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Invoice</title>
+<style>
+  body{font-family:Arial, sans-serif; padding:20px; color:#111}
+  .head{display:flex; align-items:center; gap:12px}
+  .logo{width:54px;height:54px;border-radius:12px;background:#000;padding:6px;object-fit:contain}
+  h1{margin:0;font-size:18px}
+  .muted{color:#666;font-size:12px;margin-top:4px}
+  table{width:100%;border-collapse:collapse;margin-top:14px}
+  th,td{border:1px solid #ddd;padding:8px;font-size:13px}
+  th{background:#f6f6f6}
+  .totals{margin-top:12px; max-width:420px; margin-inline-start:auto}
+  .totals div{display:flex; justify-content:space-between; padding:6px 0; font-weight:700}
+  .totals .grand{border-top:2px solid #111; padding-top:10px}
+  .box{margin-top:12px; padding:10px; border:1px solid #ddd; border-radius:10px}
+  .btn{margin-top:14px; padding:10px 12px; border:1px solid #111; background:#fff; cursor:pointer; border-radius:10px; font-weight:700}
+  @media print{ .btn{display:none} body{padding:0} }
+</style>
+</head>
+<body>
+  <div class="head">
+    <img class="logo" src="https://uploads.onecompiler.io/43xh82fwf/44atfud5t/Photoroom-20260117_132534545.png" alt="logo"/>
+    <div>
+      <h1>siymon</h1>
+      <div class="muted">${dateStr}</div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div><b>${tr.customer}:</b> ${name || "-"}</div>
+    <div><b>${tr.phone}:</b> ${phone || "-"}</div>
+    <div><b>${tr.address}:</b> ${addr || "-"}</div>
+    <div><b>${tr.notes}:</b> ${notes || "-"}</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>${tr.items}</th>
+        <th style="width:70px;text-align:center">Qty</th>
+        <th style="width:120px;text-align:center">Price</th>
+        <th style="width:140px;text-align:center">Total</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="totals">
+    <div><span>${tr.subtotal}</span><span>${money(sub)}</span></div>
+    <div><span>${tr.deliveryFee}</span><span>${money(fee)}</span></div>
+    <div class="grand"><span>${tr.total}</span><span>${money(grand)}</span></div>
+  </div>
+
+  <button class="btn" onclick="window.print()">${lang==="ar" ? "طباعة" : "Print"}</button>
+</body>
+</html>
+      `.trim();
+    }
+
+    function printInvoice(){
+      if(cart.size === 0){
+        alert(i18n[lang].validations.needItems);
+        return;
+      }
+      const html = buildInvoiceHTML();
+      const w = window.open("", "_blank");
+      if(!w){
+        alert(lang==="ar" ? "المتصفح منع نافذة الطباعة. اسمح بالنوافذ المنبثقة." : "Popup blocked. Please allow popups.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }
+
+    /* ✅ Bluetooth ESC/POS printing */
+    let printerChar = null;
+
+    function buildInvoiceTextPlain(){
+      const tr = i18n[lang].msg;
+      const now = new Date();
+      const dateStr = now.toLocaleString(lang === "ar" ? "ar-MA" : "en-US");
+
+      const name = custName.value.trim();
+      const phone = custPhone.value.trim();
+      const addr = custAddr.value.trim();
+      const notes = custNotes.value.trim();
+
+      const sub = cartSubTotal();
+      const fee = getDeliveryFee();
+      const grand = cartGrandTotal();
+
+      const lines = [];
+      lines.push("siymon");
+      lines.push(dateStr);
+      lines.push("------------------------------");
+      lines.push(`${tr.customer}: ${name || "-"}`);
+      if(phone) lines.push(`${tr.phone}: ${phone}`);
+      lines.push(`${tr.address}: ${addr || "-"}`);
+      if(notes) lines.push(`${tr.notes}: ${notes}`);
+      lines.push("------------------------------");
+      lines.push(tr.items + ":");
+
+      for(const [id, qty] of cart.entries()){
+        const p = getProduct(id);
+        if(!p) continue;
+        const lineTotal = p.price * qty;
+        lines.push(`- ${p.name[lang]} x ${qty} = ${money(lineTotal)}`);
+      }
+
+      lines.push("------------------------------");
+      lines.push(`${tr.subtotal}: ${money(sub)}`);
+      lines.push(`${tr.deliveryFee}: ${money(fee)}`);
+      lines.push(`${tr.total}: ${money(grand)}`);
+      lines.push("------------------------------");
+      lines.push(tr.thanks);
+      lines.push("\n\n\n");
+      return lines.join("\n");
+    }
+
+    function escposBytes(text){
+      const enc = new TextEncoder();
+      const init = new Uint8Array([0x1B,0x40]);
+      const alignCenter = new Uint8Array([0x1B,0x61,0x01]);
+      const alignLeft = new Uint8Array([0x1B,0x61,0x00]);
+      const boldOn = new Uint8Array([0x1B,0x45,0x01]);
+      const boldOff = new Uint8Array([0x1B,0x45,0x00]);
+      const cut = new Uint8Array([0x1D,0x56,0x01,0x00]);
+
+      const parts = [];
+      parts.push(init);
+      parts.push(alignCenter);
+      parts.push(boldOn);
+      parts.push(enc.encode("siymon\n"));
+      parts.push(boldOff);
+      parts.push(alignLeft);
+      parts.push(enc.encode(text));
+      parts.push(cut);
+
+      let totalLen = 0;
+      for(const p of parts) totalLen += p.length;
+
+      const out = new Uint8Array(totalLen);
+      let offset = 0;
+      for(const p of parts){
+        out.set(p, offset);
+        offset += p.length;
+      }
+      return out;
+    }
+
+    async function writeChunks(characteristic, data){
+      const chunkSize = 180;
+      for(let i=0;i<data.length;i+=chunkSize){
+        const chunk = data.slice(i, i+chunkSize);
+        if(characteristic.writeValueWithoutResponse){
+          await characteristic.writeValueWithoutResponse(chunk);
+        }else{
+          await characteristic.writeValue(chunk);
+        }
+        await new Promise(r=>setTimeout(r, 30));
+      }
+    }
+
+    async function connectBluetoothPrinter(){
+      if(!("bluetooth" in navigator)) throw new Error("UNSUPPORTED");
+      if(location.protocol !== "https:" && location.hostname !== "localhost") throw new Error("NEED_HTTPS");
+
+      const knownServices = [
+        "0000ffe0-0000-1000-8000-00805f9b34fb",
+        "0000ff00-0000-1000-8000-00805f9b34fb",
+        "49535343-fe7d-4ae5-8fa9-9fafd205e455"
+      ];
+
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: knownServices
+      });
+
+      const server = await device.gatt.connect();
+
+      const tryService = async (svcUuid) => {
+        try{
+          const svc = await server.getPrimaryService(svcUuid);
+          const chars = await svc.getCharacteristics();
+          for(const ch of chars){
+            if(ch.properties.write || ch.properties.writeWithoutResponse) return ch;
+          }
+        }catch(e){}
+        return null;
+      };
+
+      for(const svc of knownServices){
+        const ch = await tryService(svc);
+        if(ch) return ch;
+      }
+
+      const services = await server.getPrimaryServices();
+      for(const svc of services){
+        const chars = await svc.getCharacteristics();
+        for(const ch of chars){
+          if(ch.properties.write || ch.properties.writeWithoutResponse) return ch;
+        }
+      }
+
+      throw new Error("NO_WRITABLE_CHAR");
+    }
+
+    async function btPrintInvoice(){
+      if(cart.size === 0){
+        alert(i18n[lang].validations.needItems);
+        return;
+      }
+
+      try{
+        btPrintBtn.disabled = true;
+        const old = el("btPrintText").textContent;
+        el("btPrintText").textContent = i18n[lang].bt.connecting;
+
+        if(!printerChar){
+          printerChar = await connectBluetoothPrinter();
+          btHint.textContent = i18n[lang].bt.connected;
+        }
+
+        const plain = buildInvoiceTextPlain();
+        const bytes = escposBytes(plain);
+        await writeChunks(printerChar, bytes);
+
+        btHint.textContent = i18n[lang].bt.printed;
+        el("btPrintText").textContent = old;
+        btPrintBtn.disabled = false;
+      }catch(err){
+        btPrintBtn.disabled = false;
+        el("btPrintText").textContent = i18n[lang].btPrintText;
+
+        if(String(err?.message || err) === "UNSUPPORTED"){
+          alert(i18n[lang].bt.unsupported);
+        }else if(String(err?.message || err) === "NEED_HTTPS"){
+          alert(i18n[lang].bt.needHttps);
+        }else{
+          alert(i18n[lang].bt.failed);
+        }
+      }
+    }
+
+    /* ✅ Events */
+    langToggle.addEventListener("click", ()=>{
+      lang = (lang === "ar") ? "en" : "ar";
+      renderAll();
+      saveCart();
+    });
+
+    clearCartBtn.addEventListener("click", clearCart);
+
+    goCartBtn.addEventListener("click", ()=>{
+      document.getElementById("cartPanel").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+
+    sendBtn.addEventListener("click", sendToWhatsApp);
+    getAddrBtn.addEventListener("click", getLocation);
+    printBtn.addEventListener("click", printInvoice);
+    btPrintBtn.addEventListener("click", btPrintInvoice);
+
+    /* ✅ Support icon click -> phone call (number not shown) */
+    callSupportIcon.addEventListener("click", ()=>{
+      window.location.href = `tel:+${SUPPORT_PHONE}`;
+    });
+
+    deliveryFeeInput.addEventListener("input", ()=>{
+      renderCart();
+      saveCart();
+    });
+
+    [custName, custPhone, custAddr, custNotes].forEach(input=>{
+      input.addEventListener("input", ()=> saveCart());
+    });
+
+    /* ✅ Init */
+    loadCart();
+    if(!deliveryFeeInput.value) deliveryFeeInput.value = String(DEFAULT_DELIVERY_FEE);
+
+    loadTheme();
+    renderAll();
+    setInterval(()=> updateOpenStatus(), 60_000);
+  </script>
+</body>
+</html>
